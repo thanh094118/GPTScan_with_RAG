@@ -1,0 +1,43 @@
+name: incorrect-storage-key-handling
+property:
+  - storage key for bets depends on global state counter instead of unique bet id
+  - and causes data overwrite because the key is not unique
+activate: "yes"
+
+functions:
+  - resolve_bet
+function_inside:
+  - GAME
+  - save
+  - "=" 
+
+output:
+  title: "High Severity: Incorrect Storage Key Handling"
+  description: "Using global state variable as mapping key allows overwriting."
+  recommendation: "Use unique bet ID as key."
+
+static:
+  format: json
+  # --- FIX QUAN TRỌNG TẠI ĐÂY ---
+  prompt: |
+    Analyze the function 'resolve_bet'.
+    1. Find the line where data is assigned to 'GAME' mapping (e.g., GAME[...] = ...).
+    2. Extract the EXACT text inside the square brackets [ ]. Assign this to 'VariableA'.
+    3. Identify the global state variable used as a counter. Assign this to 'VariableB'.
+    
+    Example logic: If code is 'GAME[myKey] = val', then VariableA is 'myKey'.
+    
+    Please answer in the following json format: 
+    {"VariableA": "name inside brackets", "VariableB": "name of global counter"}
+  
+  output_keys:
+    - VariableA
+    - VariableB
+
+  rule:
+    # Logic: Nếu VariableA (Key) == VariableB (Counter) -> Báo Lỗi (True)
+    # Hàm find_data_dependency có logic: if args[0] == args[1]: return True
+    name: find_data_dependency
+    args:
+      - VariableA 
+      - VariableB

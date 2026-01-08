@@ -1,0 +1,31 @@
+name: "incorrect_storage_key_handling_in_resolve_bet"
+property:
+  - "Incorrect storage key handling in resolve_bet()"
+  - "causes the record to overwrite and accounting issues"
+activate: "yes"
+functions:
+  - "resolve_bet"
+function_inside:
+  - "state.bet_id"
+  - "bet_queue"
+  - "bet.bet_id"
+  - "GAME"
+static:
+  format: "json"
+  prompt: |
+    In the `resolve_bet()` function, identify:
+    - `GameStorage`: The specific `GAME` storage mapping or array where bet results are stored.
+    - `IncorrectBetId`: The variable actually used as the key for `GameStorage` (e.g., `state.bet_id` when `bet.bet_id` should be used).
+    Return as JSON: {"GameStorage": "...", "IncorrectBetId": "..."}
+  output_keys:
+    - "GameStorage"
+    - "IncorrectBetId"
+  rule:
+    name: "find_data_dependency"
+    args:
+      - "GameStorage"
+      - "IncorrectBetId"
+output:
+  title: "Incorrect Storage Key Handling"
+  description: "Incorrect handling of storage keys in the `resolve_bet()` function leads to records being overwritten, causing accounting discrepancies."
+  recommendation: "It is recommended to use the unique `bet.bet_id` for storing the results of both single and multiple bets in the `GAME` storage."

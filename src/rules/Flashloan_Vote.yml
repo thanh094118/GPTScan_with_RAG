@@ -1,0 +1,41 @@
+name: incorrect-storage-key-handling
+# Sửa lại property cho rõ nghĩa
+property:
+  - resolve_bet function uses a global counter as the storage key
+  - instead of a unique bet identifier causing data overwrites
+activate: "yes"
+
+# --- FIX NỘI DUNG 1: Bộ lọc tĩnh dùng list từ khóa đơn giản ---
+functions:
+  - resolve_bet
+function_inside:
+  - GAME
+  - "=" # Phải có phép gán
+  - "[" # Phải có truy cập mảng/mapping
+
+output:
+  title: "High: Incorrect Storage Key Handling"
+  description: "The function uses a global counter variable as the key for 'GAME' storage, which leads to data overwrites."
+  recommendation: "Use the unique bet ID as the storage key."
+
+static:
+  format: json
+  # --- FIX NỘI DUNG 2: Prompt hỏi theo vai trò (Role), không hỏi tên cứng ---
+  prompt: |
+    Analyze the `resolve_bet` function logic.
+    1. Identify the variable used inside the brackets `[]` when assigning to `GAME` mapping (e.g., GAME[Key] = ...). Extract this variable name as 'KeyUsed'.
+    2. Identify the variable that represents the global state counter/index (often defined outside the function or in 'state'). Extract this variable name as 'GlobalCounter'.
+
+    Return JSON: {"KeyUsed": "...", "GlobalCounter": "..."}
+
+  output_keys:
+    - KeyUsed
+    - GlobalCounter
+
+  # --- FIX NỘI DUNG 3: Logic so sánh đúng hướng ---
+  rule:
+    name: find_data_dependency
+    args:
+      - KeyUsed # Biến đích (Cái đang bị nghi ngờ)
+      - GlobalCounter # Biến nguồn (Cái sai)
+    # Nếu KeyUsed phụ thuộc vào GlobalCounter -> LỖI.

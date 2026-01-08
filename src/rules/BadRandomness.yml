@@ -1,0 +1,25 @@
+name: bad-randomness
+property:
+  - using insecure sources of randomness like block.timestamp, block.number, or block.difficulty (or block.prevrandao)
+  - to determine the outcome of a game, lottery, or critical logic.
+function_not_inside:
+  - random_safe
+function_contain_any:
+  - ['random', 'rand']
+  - ['lottery', 'game', 'winner', 'roll', 'bet', 'pick']
+activate:
+  "yes"
+output:
+  title: "WE-001: Bad Randomness"
+  description: Using block attributes for randomness is insecure.
+  recommendation: Use Chainlink VRF.
+static:
+  format: plain
+  multisteps: True
+  # Prompt này yêu cầu GPT trích xuất dòng code bị lỗi
+  prompt: 
+    - Which statement uses `block.timestamp`, `block.difficulty`, `block.prevrandao` or `block.number`? Answer only ZERO or ONE statement, cover the code with backquotes.
+  output_keys:  
+    - StatementsA
+  # QUAN TRỌNG: Đã xóa phần "rule: name: check_require" ở đây 
+  # Để GPTScan tin tưởng kết quả tìm được từ GPT mà không cần check lại bằng static analysis.

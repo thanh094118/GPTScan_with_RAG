@@ -1,0 +1,49 @@
+{
+    "version": "1.1.0",
+    "success": true,
+    "message": null,
+    "results": [
+        {
+            "code": "incorrect_storage_key_handling",
+            "severity": "HIGH",
+            "title": "High: Incorrect storage key handling in resolve_bet() causes the record to overwrite and accounting issues",
+            "description": "When resolving multiple bets, the `resolve_bet()` function uses the global `state.bet_id` as the key instead of the unique `bet.bet_id`, causing records to be overwritten.",
+            "recommendation": "Ensure that a unique identifier, such as `bet.bet_id`, is used as the storage key instead of a global or non-unique identifier like `state.bet_id` to prevent data overwrites and maintain correct accounting.",
+            "affectedFiles": [
+                {
+                    "filePath": "/home/thanh/blockchain/GPTScan/contracts/se2.sol",
+                    "range": {
+                        "start": {
+                            "line": 52
+                        },
+                        "end": {
+                            "line": 86
+                        }
+                    },
+                    "highlights": []
+                }
+            ]
+        },
+        {
+            "code": "incorrect-storage-key-handling",
+            "severity": "HIGH",
+            "title": "High Severity: Incorrect Storage Key Handling",
+            "description": "Using global state variable as mapping key allows overwriting.",
+            "recommendation": "Use unique bet ID as key.",
+            "affectedFiles": [
+                {
+                    "filePath": "/home/thanh/blockchain/GPTScan/contracts/se2.sol",
+                    "range": {
+                        "start": {
+                            "line": 52
+                        },
+                        "end": {
+                            "line": 86
+                        }
+                    },
+                    "highlights": []
+                }
+            ]
+        }
+    ]
+}

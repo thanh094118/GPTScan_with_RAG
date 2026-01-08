@@ -1,0 +1,42 @@
+{
+  "report_file": "AllInGames_Coin_Flip_Final_Audit_Report.pdf",
+  "contract_name": "CoinFlip_Vulnerable",
+  "most_likely_vulnerability_index": 1,
+  "vulnerabilities": [
+    {
+      "id_name": "Incorrect validation in submit_bet() leads to stuck funds in the contract",
+      "affected_function": "submit_bet()",
+      "root_cause": "The validation for the number of flips in `submit_flip_coin()` does not handle cases where `auto_bet.flips` is 0 with `GameType Multiple`, leading to a division by zero error in `resolve_bet()`."
+    },
+    {
+      "id_name": "Incorrect storage key handling in resolve_bet() causes the record to overwrite and accounting issues",
+      "affected_function": "resolve_bet()",
+      "root_cause": "Incorrect handling of storage keys in the `resolve_bet()` function leads to records being overwritten, causing accounting discrepancies."
+    },
+    {
+      "id_name": "Timing variability in curve25519-dalek's Scalar29::sub/Scalar52::sub",
+      "affected_function": "Global",
+      "root_cause": "Timing variability in specific cryptographic operations within the `curve25519-dalek` library."
+    },
+    {
+      "id_name": "Inefficient string allocations may lead to degraded contract performance",
+      "affected_function": "Global",
+      "root_cause": "Inefficient allocation of strings can negatively impact the contract's performance."
+    },
+    {
+      "id_name": "Unnecessary let binding may lead to less efficient code",
+      "affected_function": "Global",
+      "root_cause": "The presence of unnecessary `let` bindings makes the code less efficient."
+    },
+    {
+      "id_name": "Unnecessary return statement increases code verbosity",
+      "affected_function": "Global",
+      "root_cause": "Unnecessary return statements add to the verbosity of the code."
+    },
+    {
+      "id_name": "Redundant conversion increases code complexity",
+      "affected_function": "Global",
+      "root_cause": "Redundant conversions unnecessarily increase the complexity of the code."
+    }
+  ]
+}

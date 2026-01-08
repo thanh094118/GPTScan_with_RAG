@@ -1,0 +1,42 @@
+name: "missing_address_validation_constructor"
+property:
+  - "Constructor fails to validate input addresses"
+  - "allowing zero addresses for bank_addr or random_addr"
+activate: "yes"
+
+# --- FIX 1: Dùng tên hàm Solidity ---
+functions:
+  - "constructor"
+
+# --- FIX 2: Từ khóa Solidity ---
+function_inside:
+  - "address"
+  - "_bank_addr"
+  - "_random_addr"
+
+output:
+  title: "Missing address validation in constructor"
+  description: "The constructor accepts address parameters (_bank_addr, _random_addr) without checking if they are address(0)."
+  recommendation: "Add require checks: require(_addr != address(0), 'Invalid address');"
+
+static:
+  format: "json"
+  # --- FIX 3: Prompt tìm tham số đầu vào (Arguments) ---
+  prompt: |
+    Analyze the `constructor`. 
+    Identify the argument variables passed to the constructor that represent the 'bank address' and 'random address'.
+    (Do NOT extract 'owner' if it is assigned to msg.sender).
+
+    Return as JSON: {"BankArg": "...", "RandomArg": "..."}
+
+  output_keys:
+    - "BankArg"
+    - "RandomArg"
+
+  # --- FIX 4: Kiểm tra Validation ---
+  rule:
+    name: "has_check" # Hoặc has_eq_check(Var, "address(0)") nếu tool hỗ trợ
+    args:
+      - "BankArg"
+      - "RandomArg"
+    # Logic: Nếu BankArg hoặc RandomArg không được check (require/if) -> Báo lỗi.

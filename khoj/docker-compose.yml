@@ -1,0 +1,92 @@
+services:
+  database:
+    image: docker.io/pgvector/pgvector:pg15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - khoj_db:/var/lib/postgresql/data/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - khoj-network
+
+  sandbox:
+    image: ghcr.io/khoj-ai/terrarium:latest
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 2
+    networks:
+      - khoj-network
+
+  search:
+    image: docker.io/searxng/searxng:latest
+    volumes:
+      - khoj_search:/etc/searxng
+    environment:
+      - SEARXNG_BASE_URL=http://localhost:8080/
+    networks:
+      - khoj-network
+
+  server:
+    depends_on:
+      database:
+        condition: service_healthy
+    # Dùng phiên bản ổn định beta.22 để tránh lỗi 500 hoặc bản dev như bạn chọn
+    image: ghcr.io/khoj-ai/khoj:dev
+    ports:
+      - "42110:42110"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    working_dir: /app
+    volumes:
+      - khoj_config:/root/.khoj/
+      - khoj_models:/root/.cache/torch/sentence_transformers
+      - khoj_models:/root/.cache/huggingface
+      # Mount folder dữ liệu
+      - ./audit_reports:/app/audit_reports:ro
+      # Mount file config vào đường dẫn /app để container dễ đọc
+      - ./khoj.yml:/root/.khoj/khoj.yml
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_HOST=database
+      - POSTGRES_PORT=5432
+      - KHOJ_DJANGO_SECRET_KEY=secret-key-audit-project
+      - KHOJ_DEBUG=True
+      - KHOJ_ADMIN_EMAIL=thanh
+      - KHOJ_ADMIN_PASSWORD=thanh
+      - KHOJ_TERRARIUM_URL=http://sandbox:8080
+      - KHOJ_SEARXNG_URL=http://search:8080
+      
+      # --- CẤU HÌNH GEMINI (GOOGLE) ---
+      # Key Google AI Studio của bạn
+      - GEMINI_API_KEY=AIzaSyDl4GOtAb41jV3NgndjYcPYH7x7ZP4CvdQ
+      # Tên Model (Lưu ý: Đảm bảo tên model này chính xác với Google AI Studio)
+      - KHOJ_DEFAULT_CHAT_MODEL=gemini-2.5-flash-lite
+      # -------------------------------------
+
+      - KHOJ_NO_HTTPS=True
+      - KHOJ_DOMAIN=localhost
+      - KHOJ_CONFIG_FILE=/app/khoj.yml
+      
+    command: --host="0.0.0.0" --port=42110 -vv --anonymous-mode --non-interactive
+    networks:
+      - khoj-network
+
+volumes:
+  khoj_config:
+  khoj_db:
+  khoj_models:
+  khoj_search:
+
+networks:
+  khoj-network:
+    driver: bridge

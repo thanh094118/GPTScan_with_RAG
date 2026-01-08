@@ -1,0 +1,34 @@
+name: "missing_address_validation_in_instantiate"
+property:
+  - "Missing address validation in instantiate()"
+  - "The `instantiate` function fails to validate the owner, bank\\_addr, and random\\_addr fields, allowing improperly formatted or invalid addresses."
+activate: "yes"
+functions:
+  - "instantiate()"
+function_inside:
+  - "instantiate"
+  - "InstantiateMsg"
+  - "owner"
+  - "bank_addr"
+  - "random_addr"
+  - "info.sender"
+static:
+  format: "json"
+  prompt: |
+    Analyze the `instantiate()` function. Identify and extract the code expressions or variables corresponding to `owner`, `bank_addr`, and `random_addr`.
+    Return the identified elements as a JSON object with keys: "owner", "bank_addr", "random_addr".
+    Example: {"owner": "msg.owner_address", "bank_addr": "msg.bank_address", "random_addr": "msg.random_generator_address"}
+  output_keys:
+    - "owner"
+    - "bank_addr"
+    - "random_addr"
+  rule:
+    name: "has_check"
+    args:
+      - "owner"
+      - "bank_addr"
+      - "random_addr"
+output:
+  title: "SECURITY: Missing address validation in instantiate()"
+  description: "The `instantiate` function fails to validate the owner, bank\\_addr, and random\\_addr fields, allowing improperly formatted or invalid addresses."
+  recommendation: "The `instantiate()` function should implement validation for all addresses provided in the `InstantiateMsg`."

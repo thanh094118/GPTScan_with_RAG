@@ -1,0 +1,37 @@
+{
+  "source_info": {
+    "report_file": "AllInGames_Coin_Flip_Final_Audit_Report.pdf",
+    "vulnerability_id_name": "Incorrect storage key handling in resolve_bet() causes the record to overwrite and accounting issues",
+    "affected_function": "resolve_bet()",
+    "root_cause": "Incorrect handling of storage keys in the `resolve_bet()` function leads to records being overwritten, causing accounting discrepancies.",
+    "vulnerability_number": 2,
+    "model_used": "Server Default"
+  },
+  "raw_extraction_response": "Here are the technical details for the vulnerability \"Incorrect storage key handling in resolve_bet() causes the record to overwrite and accounting issues\" from the \"AllInGames_Coin_Flip_Final_Audit_Report.pdf\":\n\n1.  **Context & Static Filter**:\n    *   **Target Function**: `resolve_bet()`\n    *   **Code Keywords**: `state.bet_id`, `bet_queue`, `bet.bet_id`, `GAME`\n\n2.  **Analysis for LLM Prompt**:\n    *   **Variables/Statements to Identify**: The LLM should identify the logic within the `resolve_bet()` function that uses `state.bet_id` as a key for storing results of multiple bets, instead of the unique `bet.bet_id`.\n    *   **Actual Variable Names**: `state.bet_id`, `bet_queue`, `bet.bet_id`, `GAME`\n\n3.  **Logic Selection**:\n    *   **Python Function**: `find_data_dependency(VarDest, VarSource)`\n    *   **Reasoning**: The vulnerability arises because a critical variable (`GAME` storage) is being written to using an unsafe or incorrect source (`state.bet_id` instead of `bet.bet_id`) for multiple bets. This directly maps to identifying a data dependency where the destination (`GAME` storage) is being populated from an inappropriate source, leading to data overwrites.\n\n4.  **Remediation**:\n    It is recommended to use the unique `bet.bet_id` for storing the results of both single and multiple bets in the `GAME` storage.",
+  "gptscan_rule_config": {
+    "context_static_filter": {
+      "target_function": "resolve_bet()",
+      "code_keywords": [
+        "state.bet_id",
+        "bet_queue",
+        "bet.bet_id",
+        "GAME"
+      ]
+    },
+    "analysis_for_llm_prompt": {
+      "raw_content": "*   **Variables/Statements to Identify**: The LLM should identify the logic within the `resolve_bet()` function that uses `state.bet_id` as a key for storing results of multiple bets, instead of the unique `bet.bet_id`.\n    *   **Actual Variable Names**: `state.bet_id`, `bet_queue`, `bet.bet_id`, `GAME`",
+      "variables_to_identify": "The LLM should identify the logic within the `resolve_bet()` function that uses `state.bet_id` as a key for storing results of multiple bets, instead of the unique `bet.bet_id`.",
+      "actual_variable_names": [
+        "state.bet_id",
+        "bet_queue",
+        "bet.bet_id",
+        "GAME"
+      ]
+    },
+    "logic_selection": {
+      "function_call": "find_data_dependency(VarDest, VarSource)",
+      "reasoning": "The vulnerability arises because a critical variable (`GAME` storage) is being written to using an unsafe or incorrect source (`state.bet_id` instead of `bet.bet_id`) for multiple bets. This directly maps to identifying a data dependency where the destination (`GAME` storage) is being populated from an inappropriate source, leading to data overwrites."
+    },
+    "remediation": "It is recommended to use the unique `bet.bet_id` for storing the results of both single and multiple bets in the `GAME` storage."
+  }
+}
